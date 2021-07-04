@@ -110,12 +110,22 @@ get_seguidores([Nombre|[Contrasenia|[Fecha|[Seguidores|T]]]], Seguidores_s) :-
 
 
 /*
+ Descripción de la relación: Predicado selector de los seguidos por el usuario.
+ Entrada: list x variable
+ Salida: variable (lista de str) ó bool
+*/
+get_seguidos([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|T]]]]], Seguidos_s) :-
+	es_usuario([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|T]]]]]),
+	append([], Seguidos_s, Seguidos).
+
+
+/*
  Descripción de la relación: Predicado selector de los ids de publicaciones del usuario.
  Entrada: list x variable
  Salida: variable (lista de int) ó bool
 */
-get_Id_publicaciones([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|T]]]]], Id_publicaciones_s) :-
-	es_usuario([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|T]]]]]),
+get_Id_publicaciones([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|T]]]]]], Id_publicaciones_s) :-
+	es_usuario([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|T]]]]]]),
 	append([], Id_publicaciones_s, Id_publicaciones).
 
 
@@ -124,8 +134,8 @@ get_Id_publicaciones([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|T
  Entrada: list x variable
  Salida: variable (lista de int) ó bool
 */
-get_P_compartidas_yo([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|[P_compartidas_yo|T]]]]]], P_compartidas_yo_s) :-
-	es_usuario([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|[P_compartidas_yo|T]]]]]]),
+get_P_compartidas_yo([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|[P_compartidas_yo|T]]]]]]], P_compartidas_yo_s) :-
+	es_usuario([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|[P_compartidas_yo|T]]]]]]]),
 	append([], P_compartidas_yo_s, P_compartidas_yo).
 
 
@@ -134,8 +144,8 @@ get_P_compartidas_yo([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|[
  Entrada: list x variable
  Salida: variable (lista de int) ó bool
 */
-get_P_compartidas_otro([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|[P_compartidas_yo|[P_compartidas_otro|T]]]]]]], P_compartidas_otro_s) :-
-	es_usuario([Nombre|[Contrasenia|[Fecha|[Seguidores|[Id_publicaciones|[P_compartidas_yo|[P_compartidas_otro|T]]]]]]]),
+get_P_compartidas_otro([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|[P_compartidas_yo|[P_compartidas_otro|T]]]]]]]], P_compartidas_otro_s) :-
+	es_usuario([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|[P_compartidas_yo|[P_compartidas_otro|T]]]]]]]]),
 	append([], P_compartidas_otro_s, P_compartidas_otro).
 
 
@@ -184,6 +194,31 @@ get_Fecha_post([Id_post|[Contenido_post|[Autor_post|[Fecha_post|T]]]], Fecha_pos
 
 
 % Otros Selectores 
+
+/*
+ Descripción de la relación: Predicado que selecciona un usuario por su nombre.
+ Entrada: list(usuarios) x str x variable
+ Salida: variable (usuario) ó bool
+ set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
+*/
+get_usuario([[H|T1]|T2], Nombre, Usuario_encontrado) :-
+	es_lista_usuarios([[H|T1]|T2]),
+	string(Nombre),
+
+	(H == Nombre,
+	get_nombre([H|T1], Nombre_nuevo),
+	get_contrasenia([H|T1], Contra_nueva),
+	get_fecha_user([H|T1], Fecha_nueva),
+	get_seguidores([H|T1], Seguidores_nuevo),
+	get_seguidos([H|T1], Seguidos_nuevo),
+	get_Id_publicaciones([H|T1], Id_publicaciones_nuevo),
+	get_P_compartidas_yo([H|T1], P_compartidas_yo_nuevo),
+	get_P_compartidas_otro([H|T1], P_compartidas_otro_nuevo),
+	set_usuario(Nombre_nuevo, Contra_nueva, Fecha_nueva, Seguidores_nuevo, Seguidos_nuevo, Id_publicaciones_nuevo, P_compartidas_yo_nuevo, P_compartidas_otro_nuevo, Nuevo_usuario),
+	append([], Nuevo_usuario, Usuario_encontrado));
+
+	get_usuario(T2, Nombre, Usuario_encontrado).
+
 
 
 
@@ -297,6 +332,48 @@ es_nombre_disponible([[H|T1]|T2], Nombre) :-
 	es_nombre_disponible(T2, Nombre).
  es_nombre_disponible([], _). 
 
+/*
+ Descripción de la relación: Predicado que verifica si el nombre y la contraseña se encuentran registrados en socialNetwork.
+ Entrada: list(usuarios) x str x str
+ Salida: bool
+*/
+es_usuario_registrado([[H|T1]|T2], Nombre, Contrasenia) :-
+	string(Nombre),
+	string(Contrasenia),
+	es_lista_usuarios([[H|T1]|T2]),
+
+	get_contrasenia([H|T1], C_s),
+
+	(H == Nombre,
+	C_s == Contrasenia);
+
+	es_usuario_registrado(T2, Nombre, Contrasenia).
+
+
+% Otros Predicados 
+
+/*
+ Descripción de la relación: Predicado que elimina un elemento de una lista.
+ Entrada: list x list x variable
+ Salida: variable ó bool
+*/
+remover(Elemento, [Elemento|T], T).
+remover(Elemento, [H|T], [H|T2]) :- remover(Elemento, T, T2).
+
+
+/*
+ Descripción de la relación: Predicado que elimina un usuario de la lista según el nombre.
+ Entrada: list(usuarios) x str x variable
+ Salida: list(usuarios) ó bool
+*/
+eliminar_usuario([H|T], Nombre, Resultado) :-
+	es_lista_usuarios([H|T]),
+	string(Nombre),
+	get_usuario([H|T], Nombre, Usuario_encontrado),
+	remover(Usuario_encontrado, [H|T], Resultado).
+eliminar_usuario([], _, _).
+
+
 
 
 % ///////////////// socialNetworkRegister /////////////////
@@ -327,5 +404,35 @@ socialNetworkRegister([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, Date, Soci
 
 	/* Se genera un nuevo socialNetwork */
 	socialNetwork([Nueva_lista_usuarios, T1, [[]], T3, T4], SocialNetwork2).
+
+
+
+
+% ///////////////// Consulta socialNetworkLogin /////////////////	
+
+/*
+ Descripción de la relación: Predicado que permite logear a un usuario registrado.
+ Entrada: socialNetwork x str x str x socialNetwork
+ Salida: bool
+*/
+socialNetworkLogin([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, SocialNetwork2) :-
+	/* Predicado de corte en caso de ya haber un usuario activo en socialNetwork, arroje falso de inmediato */
+	(T2 \= [[]], !, fail);
+
+ 	es_socialNetwork([H|[T1|[T2|[T3|[T4|_]]]]]), /* Se verifica que corresponda a una socialNetwork */
+	string(Nombre), /* Se verifica que Nombre sea un string */
+	string(Contrasenia), /* Se verifica que Contrasenia sea un string */
+
+	/* Predicado que verifica si el usuario se encuentra registrado */
+	es_usuario_registrado(H, Nombre, Contrasenia),
+
+	/* Se obtiene el usuario que iniciara sesion */
+	get_usuario(H, Nombre, User_activo),
+
+	/* Se elimina el usuario de la lista de usuarios, para que sólo esté como usuario activo */
+	eliminar_usuario(H, Nombre, Resultado),
+
+	/* Se genera un nuevo socialNetwork */
+	socialNetwork([Resultado, T1, [User_activo], T3, T4], SocialNetwork2).
 
 
