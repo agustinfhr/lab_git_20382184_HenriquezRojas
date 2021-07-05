@@ -374,6 +374,14 @@ eliminar_usuario([H|T], Nombre, Resultado) :-
 eliminar_usuario([], _, _).
 
 
+/*
+ Descripción de la relación: Predicado que crea un nuevo id.
+ Entrada: list x variable
+ Salida: variable(integer) ó bool
+*/
+nuevoId([_|L], C) :- nuevoId(L, C_ant), C is C_ant+1.
+nuevoId([], 1).
+
 
 
 % ///////////////// socialNetworkRegister /////////////////
@@ -383,6 +391,7 @@ eliminar_usuario([], _, _).
  Descripción de la relación: Predicado que permite consultar el valor que torna socialNetwork al ocurrir el registro de un nuevo usuario 
  Entrada: socialNetwork x str x str x socialNetwork2
  Salida: bool
+ date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3).
 */
 socialNetworkRegister([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, Date, SocialNetwork2) :-
 	/* Predicado de corte en caso de ya haber un usuario activo en socialNetwork, arroje falso de inmediato */
@@ -391,7 +400,7 @@ socialNetworkRegister([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, Date, Soci
 	es_socialNetwork([H|[T1|[T2|[T3|[T4|_]]]]]), /* Se verifica que corresponda a una socialNetwork */
 	string(Nombre), /* Se verifica que Nombre sea un string */
 	string(Contrasenia), /* Se verifica que Contrasenia sea un string */
-	es_lista_enteros(Date),
+	es_lista_enteros(Date), /* Se verifica que corresponda a una fecha */
 
 	/* Predicado que verifica si Nombre se encuentra disponible para registrar */
 	es_nombre_disponible(H, Nombre),
@@ -414,6 +423,7 @@ socialNetworkRegister([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, Date, Soci
  Descripción de la relación: Predicado que permite logear a un usuario registrado.
  Entrada: socialNetwork x str x str x socialNetwork
  Salida: bool
+ date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4).
 */
 socialNetworkLogin([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, SocialNetwork2) :-
 	/* Predicado de corte en caso de ya haber un usuario activo en socialNetwork, arroje falso de inmediato */
@@ -435,4 +445,137 @@ socialNetworkLogin([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, SocialNetwork
 	/* Se genera un nuevo socialNetwork */
 	socialNetwork([Resultado, T1, [User_activo], T3, T4], SocialNetwork2).
 
+
+
+
+% ///////////////// socialNetworkPost /////////////////
+
+/*
+ Descripción de la relación: Predicado que permite a un usuario con sesión iniciada en la plataforma realizar una nueva publicacion.
+ Entrada: socialNetwork x fecha x str x str list x socialNetwork2      
+ Salida: variable(socialNetwork) ó bool
+ set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
+ set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
+ socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
+ date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
+*/
+socialNetworkPost([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, Texto, SocialNetwork2) :-
+	/* Se verifica que el socialNetwork cuenta con un usuario activo */
+	([T2] == [], !, fail);
+
+	es_socialNetwork([H|[T1|[[T2|_]|[T3|[T4|_]]]]]), /* Se verifica que corresponda a un socialNetwork */
+	es_lista_enteros(Fecha), /* Se verifica que corresponda a una fecha */
+	string(Texto), /* Se verifica que Texto sea un string */
+	%es_lista_strings(ListaUsernamesDest), /* Se verifica que ListaUsernamesDest sea una lista de strings */
+
+	/* Se determina un nuevo Id para la publicacion a crear */
+	nuevoId(T1, Id_p),
+
+	/* Se obtiene el nombre del usuario activo */
+	get_nombre(T2, Autor_post),
+
+	/* Se obtiene el usuario activo */
+	get_usuario([T2], Autor_post, Usuario_encontrado),
+
+	/* Se obtienen los datos del usuario activo */
+	get_nombre(Usuario_encontrado, Nombre_s),
+	get_contrasenia(Usuario_encontrado, Contra_s),
+	get_fecha_user(Usuario_encontrado, 	Fecha_s),
+	get_seguidores(Usuario_encontrado, Seguidores_s),
+	get_seguidos(Usuario_encontrado, Seguidos_s),
+	get_Id_publicaciones(Usuario_encontrado, Id_p_s),
+	get_P_compartidas_yo(Usuario_encontrado, P_compartidas_yo_s),
+	get_P_compartidas_otro(Usuario_encontrado, P_compartidas_otro_s),
+
+	/* Se actualiza la lista de Id's de publicaciones del usuario activo */
+	append(Id_p_s, [Id_p], Id_p_s_nuevo),
+
+	/* Se crea un nuevo usuario con los datos actualizados */
+	set_usuario(Nombre_s, Contra_s, Fecha_s, Seguidores_s, Seguidos_s, Id_p_s_nuevo, P_compartidas_yo_s, P_compartidas_otro_s, Usuario_generado),
+
+	/* Se crea una nueva publicacion */
+	set_post(Id_p, Texto, Autor_post, Fecha, Post_nuevo),
+
+	/* Se actualizan la lista de usuarios y la de publicaciones */
+	append(H, [Usuario_generado], Nueva_lista_usuarios),
+	append(T1, [Post_nuevo], Nueva_lista_post),
+
+	/* Se genera un nuevo socialNetwork */
+	socialNetwork([Nueva_lista_usuarios, Nueva_lista_post, [[]], T3, T4], SocialNetwork2).
+
+
+
+
+% ///////////////// socialNetworkFollow /////////////////
+
+/*
+ Descripción de la relación: Predicado que permite a un usuario con sesión iniciada en la plataforma realizar un follow.
+ Entrada: socialNetwork x str x socialNetwork2      
+ Salida: variable(socialNetwork) ó bool
+ set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
+ set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
+ socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
+ date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
+*/
+socialNetworkFollow([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Nombre, SocialNetwork2) :-
+	/* Se verifica que el socialNetwork cuenta con un usuario activo */
+	([T2] == [], !, fail);
+
+	es_socialNetwork([H|[T1|[[T2|_]|[T3|[T4|_]]]]]), /* Se verifica que corresponda a un socialNetwork */
+	string(Nombre), /* Se verifica que corresponda a un nombre */
+	
+	/* Se obtiene el nombre del usuario activo */
+	get_nombre(T2, Autor_follow),
+	
+	/* Se obtiene el usuario activo */
+	get_usuario([T2], Autor_follow, Usuario_encontrado_2),
+
+	/* Se obtienen los datos del usuario activo */
+	get_nombre(Usuario_encontrado_2, Nombre_s2),
+	get_contrasenia(Usuario_encontrado_2, Contra_s2),
+	get_fecha_user(Usuario_encontrado_2, Fecha_s2),
+	get_seguidores(Usuario_encontrado_2, Seguidores_s2),
+	get_seguidos(Usuario_encontrado_2, Seguidos_s2),
+	get_Id_publicaciones(Usuario_encontrado_2, Id_p_s2),
+	get_P_compartidas_yo(Usuario_encontrado_2, P_compartidas_yo_s2),
+	get_P_compartidas_otro(Usuario_encontrado_2, P_compartidas_otro_s2),
+
+	/* Se obtiene el usuario a Seguir */
+	get_usuario(H, Nombre, Usuario_encontrado),
+
+	/* Se obtienen los datos del usuario a Seguir */
+	get_nombre(Usuario_encontrado, Nombre_s),
+	get_contrasenia(Usuario_encontrado, Contra_s),
+	get_fecha_user(Usuario_encontrado, 	Fecha_s),
+	get_seguidores(Usuario_encontrado, Seguidores_s),
+	get_seguidos(Usuario_encontrado, Seguidos_s),
+	get_Id_publicaciones(Usuario_encontrado, Id_p_s),
+	get_P_compartidas_yo(Usuario_encontrado, P_compartidas_yo_s),
+	get_P_compartidas_otro(Usuario_encontrado, P_compartidas_otro_s),
+
+	/* Se actualiza la lista de seguidores del usuario a Seguir */
+	append(Seguidores_s, [Nombre_s2], Seguidores_s_nuevo),
+
+	/* Se crea un nuevo usuario con los datos actualizados */
+	set_usuario(Nombre_s, Contra_s, Fecha_s, Seguidores_s_nuevo, Seguidos_s, Id_p_s, P_compartidas_yo_s, P_compartidas_otro_s, Usuario_generado),
+
+	/* Se elimina al usuario a Seguir de la lista de usuarios para actualizar sus datos */
+	eliminar_usuario(H, Nombre, Resultado),
+
+	/* Se actualizan la lista de usuarios con el usuario a Seguir con un nuevo seguidor */
+	append(Resultado, [Usuario_generado], Nueva_lista_usuarios),
+	
+	
+	/* Se actualiza la lista de los seguidos del usuario activo */
+	append(Seguidos_s2, [Nombre_s], Seguidos_s2_nuevo),
+
+	/* Se crea un nuevo usuario con los datos actualizados */
+	set_usuario(Nombre_s2, Contra_s2, Fecha_s2, Seguidores_s2, Seguidos_s2_nuevo, Id_p_s2, P_compartidas_yo_s2, P_compartidas_otro_s2, Usuario_generado2),
+
+	append(Nueva_lista_usuarios, [Usuario_generado2], Nueva_lista_usuarios2),
+
+
+	/* Se genera un nuevo socialNetwork */
+	socialNetwork([Nueva_lista_usuarios2, T1, [[]], T3, T4], SocialNetwork2).
+	
 
