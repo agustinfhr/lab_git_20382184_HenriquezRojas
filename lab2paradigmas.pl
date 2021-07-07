@@ -1,16 +1,9 @@
 
 /*
-
 ////////////// REPRESENTACION //////////////
-
-
 usuario => [nombre, contrasenia, fecha, [seguidores], [seguidos], [id_publicaciones], [p_compartidas_yo], [p_compartidas_otro]]
-
 post => [post_id, contenido_post, autor_post, fecha_post]
-
 socialNetwork => [[Usuario1, Usuario2, ...], [Post1, Post2, ...], [Usuario_activo], Name, Date]
-
-
 */
 
 
@@ -236,8 +229,8 @@ es_usuario([Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, 
 	es_lista_strings(Seguidores),
 	es_lista_strings(Seguidos),
 	es_lista_enteros(Id_publicaciones),
-	es_lista_enteros(P_compartidas_yo),
-	es_lista_enteros(P_compartidas_otro).
+	(P_compartidas_yo \= [[]]),
+	(P_compartidas_otro \= [[]]).
 	
 
 /*
@@ -577,5 +570,80 @@ socialNetworkFollow([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Nombre, SocialNetwork2) :-
 
 	/* Se genera un nuevo socialNetwork */
 	socialNetwork([Nueva_lista_usuarios2, T1, [[]], T3, T4], SocialNetwork2).
-	
 
+
+
+
+
+% ///////////////// socialNetworkShare /////////////////
+
+/*
+ Descripción de la relación: Predicado que permite a un usuario con sesión iniciada en la plataforma realizar un Share.
+ Entrada: socialNetwork x str x socialNetwork2      
+ Salida: variable(socialNetwork) ó bool
+ set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
+ set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
+ socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
+ date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
+*/
+socialNetworkShare([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, PostId, Nombre, SocialNetwork2) :-
+	/* Se verifica que el socialNetwork cuenta con un usuario activo */
+	([T2] == [], !, fail);
+
+	es_socialNetwork([H|[T1|[[T2|_]|[T3|[T4|_]]]]]), /* Se verifica que corresponda a un socialNetwork */
+	string(Nombre), /* Se verifica que corresponda a un nombre */
+	es_lista_enteros(Fecha), /* Se verifica que corresponda a una fecha */
+	integer(PostId),
+	/* Se obtiene el nombre del usuario activo */
+	get_nombre(T2, Autor_share),
+	
+	/* Se obtiene el usuario activo */
+	get_usuario([T2], Autor_share, Usuario_encontrado_2),
+
+	/* Se obtienen los datos del usuario activo */
+	get_nombre(Usuario_encontrado_2, Nombre_s2),
+	get_contrasenia(Usuario_encontrado_2, Contra_s2),
+	get_fecha_user(Usuario_encontrado_2, Fecha_s2),
+	get_seguidores(Usuario_encontrado_2, Seguidores_s2),
+	get_seguidos(Usuario_encontrado_2, Seguidos_s2),
+	get_Id_publicaciones(Usuario_encontrado_2, Id_p_s2),
+	get_P_compartidas_yo(Usuario_encontrado_2, P_compartidas_yo_s2),
+	get_P_compartidas_otro(Usuario_encontrado_2, P_compartidas_otro_s2),
+
+	/* Se obtiene el usuario a compartir */
+	get_usuario(H, Nombre, Usuario_encontrado),
+
+	/* Se obtienen los datos del usuario a compartir */
+	get_nombre(Usuario_encontrado, Nombre_s),
+	get_contrasenia(Usuario_encontrado, Contra_s),
+	get_fecha_user(Usuario_encontrado, 	Fecha_s),
+	get_seguidores(Usuario_encontrado, Seguidores_s),
+	get_seguidos(Usuario_encontrado, Seguidos_s),
+	get_Id_publicaciones(Usuario_encontrado, Id_p_s),
+	get_P_compartidas_yo(Usuario_encontrado, P_compartidas_yo_s),
+	get_P_compartidas_otro(Usuario_encontrado, P_compartidas_otro_s),
+
+	/* Se actualiza la lista de publicaciones compartidas del usuario a compartir*/
+	append(P_compartidas_otro_s, [[Fecha,PostId,Nombre_s2]], P_compartidas_otro_s_nuevo),
+
+	/* Se crea un nuevo usuario con los datos actualizados */
+	set_usuario(Nombre_s, Contra_s, Fecha_s, Seguidores_s, Seguidos_s, Id_p_s, P_compartidas_yo_s, P_compartidas_otro_s_nuevo, Usuario_generado),
+
+	/* Se elimina al usuario a compartir de la lista de usuarios para actualizar sus datos */
+	eliminar_usuario(H, Nombre, Resultado),
+
+	/* Se actualizan la lista de usuarios con el usuario a compartir con un nuevo post compartido */
+	append(Resultado, [Usuario_generado], Nueva_lista_usuarios),
+	
+	
+	/* Se actualiza la lista de los compartidos del usuario activo */
+	append(P_compartidas_yo_s2, [Fecha,PostId,Nombre_s], P_compartidas_yo_s2_nuevo),
+
+	/* Se crea un nuevo usuario con los datos actualizados */
+	set_usuario(Nombre_s2, Contra_s2, Fecha_s2, Seguidores_s2, Seguidos_s2, Id_p_s2, P_compartidas_yo_s2_nuevo, P_compartidas_otro_s2, Usuario_generado2),
+
+	append(Nueva_lista_usuarios, [Usuario_generado2], Nueva_lista_usuarios2),
+
+
+	/* Se genera un nuevo socialNetwork */
+	socialNetwork([Nueva_lista_usuarios2, T1, [[]], T3, T4], SocialNetwork2).
