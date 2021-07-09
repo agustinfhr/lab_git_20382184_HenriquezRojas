@@ -377,6 +377,41 @@ nuevoId([], 1).
 
 
 
+/*
+ Descripción de la relación: Predicado que convierte un usuario a string.
+ Entrada: list(usuario) x variable 
+ Salida: variable(usuario) ó bool
+*/
+usuarioTostring([Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro], UsuarioStr) :-
+	
+
+	atom_string(Nombre, Str0),
+	string_concat(Str0, "\n", Str1),
+	string_concat(Str1, "      Sigue a: ", Str2),
+	atomics_to_string(Seguidos, ',', Seguidos_str),
+	string_concat(Str2, Seguidos_str, Str3),
+	string_concat(Str3, "\n", UsuarioStr).
+
+usuarioTostring([], "[]").
+
+
+
+
+
+/*
+ Descripción de la relación: Predicado que convierte una lista de usuarios a string.
+ Entrada: list(usuarios) x variable 
+ Salida: variable(usuarios) ó bool
+*/
+usuarioStostring([H|T], Auxiliar, UsuariosString) :-
+	usuarioTostring(H, UsuarioStr),
+	string_concat(UsuarioStr, Auxiliar, Resultado_auxiliar),
+	usuarioStostring(T, Resultado_auxiliar, UsuariosString).
+usuarioStostring([], Auxiliar, Auxiliar).
+	
+
+
+
 % ///////////////// socialNetworkRegister /////////////////
 
 
@@ -647,3 +682,38 @@ socialNetworkShare([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, PostId, Nombre, SocialN
 
 	/* Se genera un nuevo socialNetwork */
 	socialNetwork([Nueva_lista_usuarios2, T1, [[]], T3, T4], SocialNetwork2).
+
+
+
+
+	
+
+
+% ///////////////// socialNetworkToString /////////////////
+
+/*
+ Descripción de la relación: Predicado que permite mostrar en pantalla la socialNetwork.
+ Entrada: socialNetwork x str x socialNetwork2      
+ Salida: variable(socialNetwork) ó bool
+ set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
+ set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
+ socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
+ date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
+*/
+socialNetworkToString( [H|[_|[[_|_]|[T3|[T4|_]]]]], SocialNetworkStr) :-
+
+	atom_string("####### Red social ", Sn0),
+	string_concat(Sn0,T3,Sn1),
+	string_concat(Sn1," ####### ",Sn2),
+	string_concat(Sn2,"\n",Sn3),
+	string_concat(Sn3,"Creada el dia ",Sn4),
+	atomics_to_string(T4, '/', T4_str),
+	string_concat(Sn4,T4_str,Sn5),
+	string_concat(Sn5,"\n",Sn6),
+	string_concat(Sn6,"*** Usuarios registrados ***",Sn7),
+	string_concat(Sn7,"\n",Sn8),
+	usuarioStostring(H,"\n",Resultado_auxiliar1),
+	string_concat(Sn8,Resultado_auxiliar1,Sn9),
+	string_concat(Sn9,"--------------------",Sn10),
+	string_concat(Sn10,"\n",Sn11),
+	string_concat(Sn11,"*** Publicaciones ***",SocialNetworkStr).
