@@ -1,15 +1,215 @@
 
+%Los ejemplos de las funcionalidades se encuentran al final del codigo 
+
+
+%////////////// REPRESENTACION //////////////
 /*
-////////////// REPRESENTACION //////////////
 usuario => [nombre, contrasenia, fecha, [seguidores], [seguidos], [id_publicaciones], [p_compartidas_yo], [p_compartidas_otro]]
-post => [post_id, contenido_post, autor_post, fecha_post]
+
+post => [id_post, contenido_post, autor_post, fecha_post]
+
 socialNetwork => [[Usuario1, Usuario2, ...], [Post1, Post2, ...], [Usuario_activo], Name, Date]
 */
 
 
-%/////////////Constructores///////// 
+% Dominios 
 
 
+%  ////// USUARIO //////
+/*
+Nombre = string representa el nombre de usuario
+Contrasenia = string que representa la contraseña del usuario
+Fecha = lista de enteros que representa la fecha de registro del usuario 
+Seguidores = lista de strings que contiene a los seguidores del usuario 
+Seguidos = lista de strings que contiene a los seguidos por el usuario  
+Id_publicaciones = lista de enteros que contiene los ids de las publcaciones que ha realizado el usuario
+P_compartidas_yo = lista que contiene las publicaciones que el usuario ha compartido 
+P_compartidas_otro = lista que contiene las publicaciones que le han compartio al usuario 
+*/
+%  ////// PUBLICACIONES(Post) //////
+/*
+Id_post = entero que representa el id de la publicacion
+Contenido_post = string que representa el contenido de la publicacion 
+Autor_post = string que representa el autor de la publicacion 
+Fecha_post = lista de enteros que contiene la fecha de la publicacion 
+*/
+% ////// SOCIALNETWORK //////
+/*
+Usuarios = lista que contiene los usuarios de la socialnetwork 
+Posts = lista que contiene las publicaciones de la socialnetwork 
+Usuario_activo = lista que contiene al usuario activo
+Name = string que representa el nombre de la socialNetrwork 
+Date = lista de enteros que contiene la fecha de creacion de la socialnetwork 
+*/
+
+% /////// FECHA ///////
+/*
+ DD = entero que representa el dia de la fecha
+ MM = entero que representa el mes de la fecha
+ YYYY = entero que representa el año de la fecha
+*/
+
+
+
+% Predicados
+
+
+% ////// Constructores ///////
+/*
+set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado)
+set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado)
+socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut)
+date(DD, MM, YYYY, Date)
+*/
+% ////// Selectores //////
+/*
+---- Usuario ----
+get_nombre([Nombre|T], Nombre_s)
+get_contrasenia([Nombre|[Contrasenia|T]], Contra_s)
+get_fecha_user([Nombre|[Contrasenia|[Fecha|T]]], Fecha_s)
+get_seguidores([Nombre|[Contrasenia|[Fecha|[Seguidores|T]]]], Seguidores_s)
+get_seguidos([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|T]]]]], Seguidos_s)
+get_Id_publicaciones([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|T]]]]]], Id_publicaciones_s)
+get_P_compartidas_yo([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|[P_compartidas_yo|T]]]]]]], P_compartidas_yo_s)
+get_P_compartidas_otro([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_publicaciones|[P_compartidas_yo|[P_compartidas_otro|T]]]]]]]], P_compartidas_otro_s) 
+
+
+---- Publicacion ----
+get_Id_post([Id_post|T], Id_post_s)
+get_Contenido_post([Id_post|[Contenido_post|T]], Contenido_post_s)
+get_Autor_post([Id_post|[Contenido_post|[Autor_post|T]]], Autor_post_s)
+get_Fecha_post([Id_post|[Contenido_post|[Autor_post|[Fecha_post|T]]]], Fecha_post_s)
+
+
+---- Otros ----
+get_usuario([[H|T1]|T2], Nombre, Usuario_encontrado)
+*/
+
+% ////// Pertenencia //////
+/*
+es_usuario([Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro])
+es_post([Id_post, Contenido_post, Autor_post, Fecha_post])
+es_lista_enteros([H|T])
+es_lista_strings([H|T])
+es_lista_usuarios([H|T])
+es_lista_usuario_activo([H|T])
+es_lista_post([H|T])
+es_socialNetwork([Usuarios, Publicaciones, Usuario_activo, Name, Date])
+es_nombre_disponible([[H|T1]|T2], Nombre)
+es_usuario_registrado([[H|T1]|T2], Nombre, Contrasenia)
+*/
+
+
+% ////// Otros predicados //////
+/*
+remover(Elemento, [Elemento|T], T)
+eliminar_usuario([H|T], Nombre, Resultado)
+nuevoId([_|L], C)
+usuarioTostring([Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro], UsuarioStr)
+usuarioStostring([H|T], Auxiliar, UsuariosString)
+postTostring([Id_post, Contenido_post, Autor_post, Fecha_post], PostStr)
+postStostring([H|T], Auxiliar, PostsString)
+usuarioactivoTostring([Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro], Usuario_activo)
+
+
+
+ ---- Register ----
+
+socialNetworkRegister([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, Date, SocialNetwork2)
+
+
+ ---- Login ----
+
+socialNetworkLogin([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, SocialNetwork2)
+
+
+ ---- Post ----
+
+socialNetworkPost([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, Texto, SocialNetwork2)
+
+
+ ---- Follow ----
+
+socialNetworkFollow([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Nombre, SocialNetwork2)
+
+
+ ---- Share ----
+
+socialNetworkShare([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, PostId, Nombre, SocialNetwork2)
+
+
+ ---- SocialNetworkToString ----
+
+socialNetworkToString( [H|[T1|[[T2|_]|[T3|[T4|_]]]]], SocialNetworkStr)
+
+*/
+
+
+
+
+
+% METAS !!!!!!!!!!!!!!!!!!
+
+
+% Principales:
+/*
+socialNetworkRegister
+socialNetworkLogin
+socialNetworkPost
+socialNetworkFollow
+socialNetworkShare
+socialNetworkToString
+socialNetwork
+date
+*/
+  
+%  Secundarias:
+/*
+set_usuario
+set_post
+
+get_nombre
+get_contrasenia
+get_fecha_user
+get_seguidores
+get_seguidos
+get_Id_publicaciones
+get_P_compartidas_yo
+get_P_compartidas_otro
+
+get_Id_post
+get_Contenido_post
+get_Autor_post
+get_Fecha_post
+
+get_usuario
+
+es_usuario
+es_post
+es_lista_enteros
+es_lista_strings
+es_lista_usuarios
+es_lista_usuario_activo
+es_lista_post
+es_socialNetwork
+es_nombre_disponible
+es_usuario_registrado
+
+remover
+eliminar_usuario
+nuevoId
+usuarioTostring
+usuarioStostring
+postTostring
+postStostring
+usuarioactivoTostring
+*/
+
+
+% REGLAS Y HECHOS 
+
+
+% ///////////// Constructores ///////// 
 
 /*
  Descripción de la relación: Constructor de un usuario.
@@ -42,7 +242,7 @@ socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
 /*
  Descripción de la relación: Constructor de date(fecha).
  Entrada: int x int x int 
- Salida: variable list ó bool
+ Salida: variable list 
 */
 date(DD, MM, YYYY, Date) :-
 	integer(DD),
@@ -57,10 +257,10 @@ date(DD, MM, YYYY, Date) :-
 	append([], Date, [DD, MM, YYYY]).
 
 
-%////////////Selectores///////////
+% //////////// Selectores ///////////
 
 
-%TDA USUARIO
+%        TDA USUARIO
 
 /*
  Descripción de la relación: Predicado selector del nombre de usuario.
@@ -142,8 +342,8 @@ get_P_compartidas_otro([Nombre|[Contrasenia|[Fecha|[Seguidores|[Seguidos|[Id_pub
 	append([], P_compartidas_otro_s, P_compartidas_otro).
 
 
-%TDA POST
 
+%              TDA PUBLICACION(POST)
 
 /*
  Descripción de la relación: Predicado selector del id de la publicacion.
@@ -186,13 +386,12 @@ get_Fecha_post([Id_post|[Contenido_post|[Autor_post|[Fecha_post|T]]]], Fecha_pos
 
 
 
-% Otros Selectores 
+%             Otros Selectores 
 
 /*
  Descripción de la relación: Predicado que selecciona un usuario por su nombre.
  Entrada: list(usuarios) x str x variable
  Salida: variable (usuario) ó bool
- set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
 */
 get_usuario([[H|T1]|T2], Nombre, Usuario_encontrado) :-
 	es_lista_usuarios([[H|T1]|T2]),
@@ -216,6 +415,7 @@ get_usuario([[H|T1]|T2], Nombre, Usuario_encontrado) :-
 
 
 % //////////// Pertenencia ////////////
+
 
 /*
  Descripción de la relación: Predicado que verifica si corresponde a un usuario.
@@ -279,7 +479,7 @@ es_lista_usuarios([]). % caso base
 
 
 /*
- Descripción de la relación: Predicado que verifica si corresponde a una lista con usuarios.
+ Descripción de la relación: Predicado que verifica si corresponde a una lista con usuario activo.
  Entrada: list (usuarios)
  Salida: bool
 */
@@ -302,7 +502,7 @@ es_lista_post([]).
 
 /*
  Descripción de la relación: Predicado que verifica si corresponde a una socialNetwork.
- Entrada: list(usuarios, publicaciones)
+ Entrada: list(usuarios, publicaciones,  )
  Salida: bool
 */
 es_socialNetwork([Usuarios, Publicaciones, Usuario_activo, Name, Date]) :-
@@ -345,6 +545,7 @@ es_usuario_registrado([[H|T1]|T2], Nombre, Contrasenia) :-
 
 % Otros Predicados 
 
+
 /*
  Descripción de la relación: Predicado que elimina un elemento de una lista.
  Entrada: list x list x variable
@@ -382,7 +583,7 @@ nuevoId([], 1).
  Entrada: list(usuario) x variable 
  Salida: variable(usuario) ó bool
 */
-usuarioTostring([Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro], UsuarioStr) :-
+usuarioTostring([Nombre, _, _, _, Seguidos, _, _, _], UsuarioStr) :-
 	
 
 	atom_string(Nombre, Str0),
@@ -393,8 +594,6 @@ usuarioTostring([Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicacio
 	string_concat(Str3, "\n", UsuarioStr).
 
 usuarioTostring([], "[]").
-
-
 
 
 
@@ -410,6 +609,64 @@ usuarioStostring([H|T], Auxiliar, UsuariosString) :-
 usuarioStostring([], Auxiliar, Auxiliar).
 	
 
+/*
+ Descripción de la relación: Predicado que convierte un post a string.
+ Entrada: list(post) x variable 
+ Salida: variable(post) ó bool
+*/
+postTostring([Id_post, Contenido_post, Autor_post, Fecha_post], PostStr) :-
+	
+
+	atom_string("\nID: ", Str0),
+	string_concat(Str0, Id_post, Str1),
+	string_concat(Str1, "\n", Str2),
+	string_concat(Str2, "El dia ", Str3),
+	atomics_to_string(Fecha_post, '/', Fecha_post_str),
+	string_concat(Str3, Fecha_post_str, Str4),
+	string_concat(Str4, " ", Str5),
+	atom_string(Autor_post, Autor_post_str),
+	string_concat(Str5, Autor_post_str, Str6),
+	string_concat(Str6, " publico:", Str7),
+	string_concat(Str7, "\n", Str8),
+	string_concat(Str8, "      ", Str9),
+	atom_string(Contenido_post, Contenido_post_str),
+	string_concat(Str9, Contenido_post_str, PostStr).
+	
+
+
+postTostring([], "[]").
+
+
+/*
+ Descripción de la relación: Predicado que convierte una lista de publicaciones a string.
+ Entrada: list(posts) x variable 
+ Salida: variable(posts) ó bool
+*/
+postStostring([H|T], Auxiliar, PostsString) :-
+	postTostring(H, PostStr),
+	string_concat(PostStr, Auxiliar, Resultado_auxiliar),
+	postStostring(T, Resultado_auxiliar, PostsString).
+postStostring([], Auxiliar, Auxiliar).
+	
+
+/*
+ Descripción de la relación: Predicado que convierte un usuario activo a string.
+ Entrada: list x variable 
+ Salida: variable ó bool
+*/
+usuarioactivoTostring([Nombre, _, _, _, Seguidos, Id_publicaciones, _, _], Usuario_activo) :-
+	atom_string("\n*** Usuario con sesion iniciada ***\n", Str0),
+	string_concat(Str0, Nombre, Str1),
+	string_concat(Str1, "\n      Sigue a: ", Str2),
+	atomics_to_string(Seguidos, ',', Seguidos_str),
+	string_concat(Str2, Seguidos_str, Str3),
+	string_concat(Str3,"\n--------------------",Str4),
+	string_concat(Str4, "\n*** Publicaciones ***\n", Str5),
+	atomics_to_string(Id_publicaciones, ',', Id_publicaciones_str),
+	string_concat(Str5, Id_publicaciones_str, Str6),
+	string_concat(Str6, "\n*** Fin publicaciones ***\n", Usuario_activo).
+	
+
 
 
 % ///////////////// socialNetworkRegister /////////////////
@@ -417,9 +674,8 @@ usuarioStostring([], Auxiliar, Auxiliar).
 
 /*
  Descripción de la relación: Predicado que permite consultar el valor que torna socialNetwork al ocurrir el registro de un nuevo usuario 
- Entrada: socialNetwork x str x str x socialNetwork2
+ Entrada: socialNetwork x str x str x list x socialNetwork2
  Salida: bool
- date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3).
 */
 socialNetworkRegister([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, Date, SocialNetwork2) :-
 	/* Predicado de corte en caso de ya haber un usuario activo en socialNetwork, arroje falso de inmediato */
@@ -445,13 +701,12 @@ socialNetworkRegister([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, Date, Soci
 
 
 
-% ///////////////// Consulta socialNetworkLogin /////////////////	
+% ///////////////// socialNetworkLogin /////////////////	
 
 /*
  Descripción de la relación: Predicado que permite logear a un usuario registrado.
- Entrada: socialNetwork x str x str x socialNetwork
+ Entrada: socialNetwork x str x str x socialNetwork2
  Salida: bool
- date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4).
 */
 socialNetworkLogin([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, SocialNetwork2) :-
 	/* Predicado de corte en caso de ya haber un usuario activo en socialNetwork, arroje falso de inmediato */
@@ -480,12 +735,8 @@ socialNetworkLogin([H|[T1|[T2|[T3|[T4|_]]]]], Nombre, Contrasenia, SocialNetwork
 
 /*
  Descripción de la relación: Predicado que permite a un usuario con sesión iniciada en la plataforma realizar una nueva publicacion.
- Entrada: socialNetwork x fecha x str x str list x socialNetwork2      
+ Entrada: socialNetwork x list x str x socialNetwork2      
  Salida: variable(socialNetwork) ó bool
- set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
- set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
- socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
- date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
 */
 socialNetworkPost([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, Texto, SocialNetwork2) :-
 	/* Se verifica que el socialNetwork cuenta con un usuario activo */
@@ -540,11 +791,7 @@ socialNetworkPost([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, Texto, SocialNetwork2) :
  Descripción de la relación: Predicado que permite a un usuario con sesión iniciada en la plataforma realizar un follow.
  Entrada: socialNetwork x str x socialNetwork2      
  Salida: variable(socialNetwork) ó bool
- set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
- set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
- socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
- date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
-*/
+ */
 socialNetworkFollow([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Nombre, SocialNetwork2) :-
 	/* Se verifica que el socialNetwork cuenta con un usuario activo */
 	([T2] == [], !, fail);
@@ -614,12 +861,8 @@ socialNetworkFollow([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Nombre, SocialNetwork2) :-
 
 /*
  Descripción de la relación: Predicado que permite a un usuario con sesión iniciada en la plataforma realizar un Share.
- Entrada: socialNetwork x str x socialNetwork2      
+ Entrada: socialNetwork x list x int x str x socialNetwork2      
  Salida: variable(socialNetwork) ó bool
- set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
- set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
- socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
- date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
 */
 socialNetworkShare([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, PostId, Nombre, SocialNetwork2) :-
 	/* Se verifica que el socialNetwork cuenta con un usuario activo */
@@ -628,7 +871,7 @@ socialNetworkShare([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, PostId, Nombre, SocialN
 	es_socialNetwork([H|[T1|[[T2|_]|[T3|[T4|_]]]]]), /* Se verifica que corresponda a un socialNetwork */
 	string(Nombre), /* Se verifica que corresponda a un nombre */
 	es_lista_enteros(Fecha), /* Se verifica que corresponda a una fecha */
-	integer(PostId),
+	integer(PostId), /* Se verifica que corresponda un entero */
 	/* Se obtiene el nombre del usuario activo */
 	get_nombre(T2, Autor_share),
 	
@@ -670,7 +913,6 @@ socialNetworkShare([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, PostId, Nombre, SocialN
 	/* Se actualizan la lista de usuarios con el usuario a compartir con un nuevo post compartido */
 	append(Resultado, [Usuario_generado], Nueva_lista_usuarios),
 	
-	
 	/* Se actualiza la lista de los compartidos del usuario activo */
 	append(P_compartidas_yo_s2, [Fecha,PostId,Nombre_s], P_compartidas_yo_s2_nuevo),
 
@@ -693,16 +935,13 @@ socialNetworkShare([H|[T1|[[T2|_]|[T3|[T4|_]]]]], Fecha, PostId, Nombre, SocialN
 
 /*
  Descripción de la relación: Predicado que permite mostrar en pantalla la socialNetwork.
- Entrada: socialNetwork x str x socialNetwork2      
+ Entrada: socialNetwork x str   
  Salida: variable(socialNetwork) ó bool
- set_usuario(Nombre, Contrasenia, Fecha, Seguidores, Seguidos, Id_publicaciones, P_compartidas_yo, P_compartidas_otro, Usuario_generado) :-
- set_post(Id_post, Contenido_post, Autor_post, Fecha_post, Post_generado) :-
- socialNetwork([Usuarios, Posts, Usuario_activo, Name, Date], SOut) :-
- date(24,5,2021,D), socialNetwork([[],[],[[]], "failbok",D], Sn1),date(25,5,2021,Du1) , socialNetworkRegister(Sn1, "mmental", "asdf", Du1, Sn2),date(25,5,2021,Du2) , socialNetworkRegister(Sn2, "mmmental", "asdf", Du2, Sn3), socialNetworkLogin(Sn3, "mmental", "asdf", Sn4), date(25,5,2021,Dp1), socialNetworkPost(Sn4, Dp1, "Primer post", Sn5).
 */
-socialNetworkToString( [H|[_|[[_|_]|[T3|[T4|_]]]]], SocialNetworkStr) :-
+socialNetworkToString( [H|[T1|[[T2|_]|[T3|[T4|_]]]]], SocialNetworkStr) :-
 
-	atom_string("####### Red social ", Sn0),
+	(T2 == [], /*Se verificara si no hay un usuario activo para mostrar la red social en general*/
+	atom_string("\n\n####### Red social ", Sn0),
 	string_concat(Sn0,T3,Sn1),
 	string_concat(Sn1," ####### ",Sn2),
 	string_concat(Sn2,"\n",Sn3),
@@ -713,7 +952,115 @@ socialNetworkToString( [H|[_|[[_|_]|[T3|[T4|_]]]]], SocialNetworkStr) :-
 	string_concat(Sn6,"*** Usuarios registrados ***",Sn7),
 	string_concat(Sn7,"\n",Sn8),
 	usuarioStostring(H,"\n",Resultado_auxiliar1),
+
 	string_concat(Sn8,Resultado_auxiliar1,Sn9),
 	string_concat(Sn9,"--------------------",Sn10),
 	string_concat(Sn10,"\n",Sn11),
-	string_concat(Sn11,"*** Publicaciones ***",SocialNetworkStr).
+	string_concat(Sn11,"*** Publicaciones ***",Sn12),
+
+	postStostring(T1,"\n",Resultado_auxiliar2),
+	string_concat(Sn12,Resultado_auxiliar2,Sn13),
+	string_concat(Sn13,"\n*** Fin publicaciones ***",SocialNetworkStr));
+
+	(T2 \= [],  /*Se verificara si hay un usuario activo para mostrar la red social desde el perfil del usuario activo*/
+	atom_string("\n\n####### Red social ", Sn0),
+	string_concat(Sn0,T3,Sn1),
+	string_concat(Sn1," ####### ",Sn2),
+	string_concat(Sn2,"\n",Sn3),
+	string_concat(Sn3,"Creada el dia ",Sn4),
+	atomics_to_string(T4, '/', T4_str),
+	string_concat(Sn4,T4_str,Sn5),
+	string_concat(Sn5,"\n",Sn6),
+
+	usuarioactivoTostring(T2, Usuario_activo),
+	string_concat(Sn6, Usuario_activo, SocialNetworkStr)).
+
+	
+
+% ///////////////////// EJEMPLOS ///////////////////////////
+
+
+% ///////////////// socialNetworkRegister /////////////////
+
+/*  Ejemplo para un usuario 
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2).
+	
+    Ejemplo para 3 usuarios 
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4).
+
+	Ejemplo para 6 usuarios 
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), date(5,1,2021,User4date) , socialNetworkRegister(Sn4, "user4", "pass4", User4date, Sn5), date(6,1,2021,User5date) , socialNetworkRegister(Sn5, "user5", "pass5", User5date, Sn6), date(6,1,2021,User6date) , socialNetworkRegister(Sn6, "user6", "pass6", User6date, Sn7). 
+
+*/
+
+
+% ///////////////// socialNetworkLogin /////////////////
+
+/*  Ejemplo para usuario no logeado
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), date(5,1,2021,User4date) , socialNetworkRegister(Sn4, "user4", "pass4", User4date, Sn5), date(6,1,2021,User5date) , socialNetworkRegister(Sn5, "user5", "pass5", User5date, Sn6), date(6,1,2021,User6date) , socialNetworkRegister(Sn6, "user6", "pass6", User6date, Sn7), socialNetworkLogin(Sn7, "user1", "pass1", Sn8).
+
+	Ejemplo para usuario con datos ingresados incorrectos, produce false
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), date(5,1,2021,User4date) , socialNetworkRegister(Sn4, "user4", "pass4", User4date, Sn5), date(6,1,2021,User5date) , socialNetworkRegister(Sn5, "user5", "pass5", User5date, Sn6), date(6,1,2021,User6date) , socialNetworkRegister(Sn6, "user6", "pass6", User6date, Sn7), socialNetworkLogin(Sn7, "user1", "pass4", Sn8).
+
+	Ejemplo para usuario no registrado, produce false
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), date(5,1,2021,User4date) , socialNetworkRegister(Sn4, "user4", "pass4", User4date, Sn5), date(6,1,2021,User5date) , socialNetworkRegister(Sn5, "user5", "pass5", User5date, Sn6), date(6,1,2021,User6date) , socialNetworkRegister(Sn6, "user6", "pass6", User6date, Sn7), socialNetworkLogin(Sn7, "user?", "pass?", Sn8).
+
+	Ejemplo con un usuario ya logeado, produce false
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), date(5,1,2021,User4date) , socialNetworkRegister(Sn4, "user4", "pass4", User4date, Sn5), date(6,1,2021,User5date) , socialNetworkRegister(Sn5, "user5", "pass5", User5date, Sn6), date(6,1,2021,User6date) , socialNetworkRegister(Sn6, "user6", "pass6", User6date, Sn7), socialNetworkLogin(Sn7, "user1", "pass1", Sn8), socialNetworkLogin(Sn8, "user2", "pass2", Sn9).
+
+*/
+
+% ///////////////// socialNetworkPost /////////////////
+
+/*  Ejemplo para una publicacion 
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6).
+
+	Ejemplo para varias publicaciones publicacion
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user2", "pass2", Sn7), date(2,2,2021,Post2date), socialNetworkPost(Sn7, Post2date, "Foto de gatito", Sn8), socialNetworkLogin(Sn8, "user3", "pass3", Sn9), date(3,2,2021,Post3date), socialNetworkPost(Sn9, Post3date, "Alguien sabe usar Prolog?", Sn10), socialNetworkLogin(Sn10, "user2", "pass2", Sn11), date(3,2,2021,Post4date), socialNetworkPost(Sn11, Post4date, "Otra foto de gatito", Sn12).
+
+	Ejemplo para una publicacion sin un login, produce false
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), date(1,2,2021,Post1date), socialNetworkPost(Sn4, Post1date, "Primer Post", Sn5).
+*/
+
+% ///////////////// socialNetworkFollow /////////////////
+
+/*  Ejemplo para un Follow
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user1", "pass1", Sn7), socialNetworkFollow(Sn7, "user2", Sn8).
+
+	Ejemplo para varios Follow
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user1", "pass1", Sn7), socialNetworkFollow(Sn7, "user2", Sn8), socialNetworkLogin(Sn8, "user1", "pass1", Sn9), socialNetworkFollow(Sn9, "user3", Sn10), socialNetworkLogin(Sn10, "user2", "pass2", Sn11), socialNetworkFollow(Sn11, "user1", Sn12).
+
+	Ejemplo para un Follow sin un login, produce false
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkFollow(Sn6, "user2", Sn7).
+*/
+
+% ///////////////// socialNetworkShare /////////////////
+
+/*  Ejemplo para un Share
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user1", "pass1", Sn7), date(1,3,2021,Share1date), socialNetworkShare(Sn7, Share1date, 1, "user2", Sn8).
+
+	Ejemplo para varios Share
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user2", "pass2", Sn7), date(2,2,2021,Post2date), socialNetworkPost(Sn7, Post2date, "Foto de gatito", Sn8), socialNetworkLogin(Sn8, "user3", "pass3", Sn9), date(3,2,2021,Post3date), socialNetworkPost(Sn9, Post3date, "Alguien sabe usar Prolog?", Sn10), socialNetworkLogin(Sn10, "user2", "pass2", Sn11), date(3,2,2021,Post4date), socialNetworkPost(Sn11, Post4date, "Otra foto de gatito", Sn12), socialNetworkLogin(Sn12, "user1", "pass1", Sn13), date(1,3,2021,Share1date), socialNetworkShare(Sn13, Share1date, 1, "user2", Sn14), socialNetworkLogin(Sn14, "user1", "pass1", Sn15), date(2,3,2021,Share2date), socialNetworkShare(Sn15, Share2date, 2, "user3", Sn16), socialNetworkLogin(Sn16, "user2", "pass2", Sn17), date(2,4,2021,Share3date), socialNetworkShare(Sn17, Share3date, 3, "user3", Sn18). 
+
+	Ejemplo para un Share sin un login, produce false
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), date(1,3,2021,Share1date), socialNetworkShare(Sn6, Share1date, 1, "user2", Sn7).
+
+
+% ///////////////// socialNetworkToString /////////////////
+
+/*  Ejemplo para 6 usuarios registrados sin usuario activo
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), date(5,1,2021,User4date) , socialNetworkRegister(Sn4, "user4", "pass4", User4date, Sn5), date(6,1,2021,User5date) , socialNetworkRegister(Sn5, "user5", "pass5", User5date, Sn6), date(6,1,2021,User6date) , socialNetworkRegister(Sn6, "user6", "pass6", User6date, Sn7), socialNetworkToString(Sn7, SnStr), write(SnStr). 
+
+	Ejemplo para una publicacion sin usuario activo
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkToString(Sn6, SnStr), write(SnStr). 
+
+	Ejemplo para varias publicaciones sin usuario activo
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user2", "pass2", Sn7), date(2,2,2021,Post2date), socialNetworkPost(Sn7, Post2date, "Foto de gatito", Sn8), socialNetworkLogin(Sn8, "user3", "pass3", Sn9), date(3,2,2021,Post3date), socialNetworkPost(Sn9, Post3date, "Alguien sabe usar Prolog?", Sn10), socialNetworkLogin(Sn10, "user2", "pass2", Sn11), date(3,2,2021,Post4date), socialNetworkPost(Sn11, Post4date, "Otra foto de gatito", Sn12), socialNetworkToString(Sn12, SnStr), write(SnStr).
+
+	Ejemplo para varios follow sin usuario activo
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user1", "pass1", Sn7), socialNetworkFollow(Sn7, "user2", Sn8), socialNetworkLogin(Sn8, "user1", "pass1", Sn9), socialNetworkFollow(Sn9, "user3", Sn10), socialNetworkLogin(Sn10, "user2", "pass2", Sn11), socialNetworkFollow(Sn11, "user1", Sn12), socialNetworkToString(Sn12, SnStr), write(SnStr). 
+
+	Ejemplo para varios Share con usuario activo	
+	date(1,1,2021,SnDate), socialNetwork([[],[],[[]], "PrologGram",SnDate], Sn1),date(2,1,2021,User1date) , socialNetworkRegister(Sn1, "user1", "pass1", User1date, Sn2), date(3,1,2021,User2date) , socialNetworkRegister(Sn2, "user2", "pass2", User2date, Sn3), date(4,1,2021,User3date) , socialNetworkRegister(Sn3, "user3", "pass3", User3date, Sn4), socialNetworkLogin(Sn4, "user1", "pass1", Sn5), date(1,2,2021,Post1date), socialNetworkPost(Sn5, Post1date, "Primer Post", Sn6), socialNetworkLogin(Sn6, "user2", "pass2", Sn7), date(2,2,2021,Post2date), socialNetworkPost(Sn7, Post2date, "Foto de gatito", Sn8), socialNetworkLogin(Sn8, "user3", "pass3", Sn9), date(3,2,2021,Post3date), socialNetworkPost(Sn9, Post3date, "Alguien sabe usar Prolog?", Sn10), socialNetworkLogin(Sn10, "user2", "pass2", Sn11), date(3,2,2021,Post4date), socialNetworkPost(Sn11, Post4date, "Otra foto de gatito", Sn12), socialNetworkLogin(Sn12, "user1", "pass1", Sn13), date(1,3,2021,Share1date), socialNetworkShare(Sn13, Share1date, 1, "user2", Sn14), socialNetworkLogin(Sn14, "user1", "pass1", Sn15), date(2,3,2021,Share2date), socialNetworkShare(Sn15, Share2date, 2, "user3", Sn16), socialNetworkLogin(Sn16, "user2", "pass2", Sn17), date(2,4,2021,Share3date), socialNetworkShare(Sn17, Share3date, 3, "user3", Sn18), socialNetworkLogin(Sn18, "user1", "pass1", Sn19), socialNetworkToString(Sn19, SnStr), write(SnStr). 
+
+*/
