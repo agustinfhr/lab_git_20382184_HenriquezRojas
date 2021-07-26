@@ -1,0 +1,8 @@
+ 
+ Instrucciones especiales al momento de la ejecución del programa:
+
+
+ Los ejemplos se encuentran al final del código fuente, lo único que hay que hacer 
+ es copiar y pegar la sección del código que tenga el ejemplo.
+
+ 
